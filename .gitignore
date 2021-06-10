@@ -1,0 +1,20 @@
+# Most output binaries names can be customized
+main.*.out*
+
+# Java
+main.class
+main.jar
+
+# Python / Cython
+main.py.c
+
+# Node.js
+node_modules
+
+# Haskell
+main.hi
+main.o
+
+# OCaml
+main.cmi
+main.cmo
