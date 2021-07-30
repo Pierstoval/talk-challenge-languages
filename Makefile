@@ -3,9 +3,26 @@ SHELL:=bash
 _TITLE := "\033[32m %s\033[0m"
 _ERROR := "\033[31m %s\033[0m"
 
-.DEFAULT_GOAL=all
+.DEFAULT_GOAL=help
 
 COUNT=0
+
+.PHONY: install
+install: clean docker ## ⚙ Install the Docker image and the languages inside it.
+
+.PHONY: docker
+docker:
+	@printf $(_TITLE)"\n" "🐳 Build the Docker image"
+	docker build . --tag pierstoval/languages:latest
+
+.PHONY: help
+help: ## ❓ Show this help.
+	@printf "\n Available commands:\n\n"
+	@grep -E '(^[a-zA-Z_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[32m%-25s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m## */[33m/'
+
+.PHONY: test
+test: ## 🚀 Execute all tests with all languages
+	docker run --rm --interactive --tty --name=pierstoval-languages --workdir /srv --volume $$(pwd):/srv pierstoval/languages:latest make all
 
 .PHONY: all
 all: clean
@@ -15,7 +32,7 @@ all: clean
 	@$(call check_hello_world,"  👉 C++",cpp)
 	@$(call check_hello_world,"  👉 Cobol",cobol)
 	@$(call check_hello_world,"  👉 Fortran",fortran)
-	@$(call check_hello_world,"  👉 Go",go)
+	@$(call check_hello_world,"  👉 🐻 Go",go)
 	@$(call check_hello_world,"  👉 Haskell",haskell)
 	@$(call check_hello_world,"  👉 Java",java)
 	@$(call check_hello_world,"  👉 Javascript\(Node.js\)",js)
@@ -24,11 +41,11 @@ all: clean
 	@$(call check_hello_world,"  👉 Lisp",lisp)
 	@$(call check_hello_world,"  👉 OCaml",ocaml)
 	@$(call check_hello_world,"  👉 Perl",perl)
-	@$(call check_hello_world,"  👉 PHP",php)
-	@$(call check_hello_world,"  👉 Python",python)
-	@$(call check_hello_world,"  👉 Ruby",ruby)
-	@$(call check_hello_world,"  👉 Rust",rust)
-	@$(call check_hello_world,"  👉 Typescript\(Deno\)",ts_deno)
+	@$(call check_hello_world,"  👉 🐘 PHP",php)
+	@$(call check_hello_world,"  👉 🐍 Python",python)
+	@$(call check_hello_world,"  👉 💎 Ruby",ruby)
+	@$(call check_hello_world,"  👉 🦀 Rust",rust)
+	@$(call check_hello_world,"  👉 🦕 Typescript\(Deno\)",ts_deno)
 	@$(call check_hello_world,"  👉 Typescript\(Node.js\)",ts)
 	@$(call check_hello_world,"  👉 V",v)
 	@echo ""
@@ -80,7 +97,7 @@ go:
 .PHONY: java
 java:
 	@javac main.java
-	@jar -m main.java.manifest -c -f main.jar main.class
+	@jar --manifest main.java.manifest --create --file main.jar main.class
 	@java -jar main.jar
 
 .PHONY: php
@@ -89,7 +106,7 @@ php:
 
 .PHONY: python
 python:
-	@python main.py
+	@python3 main.py
 
 .PHONY: ruby
 ruby:
@@ -97,7 +114,7 @@ ruby:
 
 .PHONY: rust
 rust:
-	@rustc main.rs -o main.rs.out
+	@\. "$$HOME/.cargo/env" && rustc main.rs -o main.rs.out
 	@./main.rs.out
 
 .PHONY: ts_deno
@@ -107,17 +124,18 @@ ts_deno:
 
 .PHONY: ts
 ts:
-	@npm i --save-dev @types/node > /dev/null 2>&1
-	@tsc main.ts --outFile main.ts.out
-	@node main.ts.out
+	@\. "$$NVM_DIR/nvm.sh" \
+	&& npm i --save-dev @types/node > /dev/null 2>&1 \
+	&& tsc main.ts --outFile main.ts.out \
+	&& node main.ts.out
 
 .PHONY: js
 js:
-	@node main.js
+	@\. "$$NVM_DIR/nvm.sh" && node main.js
 
 .PHONY: v
 v:
-	@~/vlang/v main.v -o main.v.out
+	@v main.v -o main.v.out
 	@./main.v.out
 
 .PHONY: cobol
@@ -154,4 +172,4 @@ lua:
 
 .PHONY: lisp
 lisp:
-	@sbcl --script main.lisp
+	@LC_ALL=en sbcl --script main.lisp

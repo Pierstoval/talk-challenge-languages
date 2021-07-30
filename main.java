@@ -1,4 +1,4 @@
-// sudo apt install default-jdk
+// sudo apt install
 // javac main.java
 // java main # Works but needs main class compiled
 // Compile a jar:

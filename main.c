@@ -1,6 +1,3 @@
-// sudo apt install gcc
-// gcc main.c -o main.c.out
-
 #include <stdio.h>
 
 int main() {
